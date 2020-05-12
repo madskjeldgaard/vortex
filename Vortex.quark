@@ -1,0 +1,11 @@
+(
+  name: "Vortex",
+  summary: "An instrument",
+  version: "0.001",
+  schelp: "Vortex.schelp",
+  dependencies: ,
+  license: "GNU GPL v3.0",
+  copyright: "madskjeldgaard",
+  ext_dependency: "",
+  url: "https://github.com/madskjeldgaard/vortex"
+)
