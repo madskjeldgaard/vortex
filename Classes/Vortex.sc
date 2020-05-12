@@ -2,6 +2,8 @@
 
 Dependencies:
 - kfilter
+- Sleet
+- Influx
 
 TODO:
 - dynamic fx patching
@@ -12,17 +14,17 @@ IDEAS:
 */
 
 VortexVoice{
-	var <>dict, <name, <numChannels, sleet;
+	var <>dict, <numChannels, sleet;
 
-	*new { |voicename='vort', numChans=2, time=8|
-		^super.new.init(voicename, numChans, time)
+	*new { |numChans=2, time=8|
+		^super.new.init(numChans, time)
 	}
 
-	init{|voicename, numChans, time|
-		name = voicename;
+	init{|numChans, time|
 		numChannels = numChans;
 		sleet = Sleet.new(numChannels: numChannels);
 
+		// Everything is stored here
 		dict = (
 			influx: nil, // Influx
 			env: nil,	
@@ -40,7 +42,6 @@ VortexVoice{
 		this.initNodeproxy(fadeTime:1);
 		this.initDefaultFxPatch;
 		this.initTimemachine;
-
 	}
 
 	initNodeproxy{|fadeTime=1|
@@ -64,6 +65,7 @@ VortexVoice{
 	}
 
 
+	// TODO
 	initDefaultFxPatch{
 
 	}
@@ -104,13 +106,37 @@ VortexVoice{
 	}
 
 	initDataWarping{
-		dict.env = this.warpingEnv(numSteps: 8, rand: 1.0, maxCurve: 5.0);
-
+		this.regenerateEnv;
 		dict.influx.addProc(\base, {|val|
 			dict.env.at(val.biuni)
 		});
 	}
 
+	regenerateEnv{|numSteps = 8, rand = 1.0, maxCurve = 3.0|
+		dict.env = this.warpingEnv(numSteps: numSteps, rand: rand, maxCurve: maxCurve);
+		^dict.env
+	}
+
+	// Getter functions
+	timebuffer{
+		^dict.timebuffer
+	}
+	 
+	nodeproxy{
+		^dict.nodeproxy
+	}
+	 
+	env{
+		^dict.env
+	}
+
+	asPseg{|durStretch=1, repeats=inf|
+		var levels = dict.env.levels;
+		var times = dict.env.times;
+		var curves = dict.env.curves;
+
+		^Pseg.new(levels, durStretch * times, curves, repeats)
+	}
 }
 
 // Main interface
@@ -219,4 +245,5 @@ InfluxTestGui{
 			}
 		})
 	}
+
 }
