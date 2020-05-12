@@ -130,12 +130,13 @@ VortexVoice{
 		^dict.env
 	}
 
-	asPseg{|durStretch=1, repeats=inf|
-		var levels = dict.env.levels;
-		var times = dict.env.times;
-		var curves = dict.env.curves;
+	pseg{|durStretch=1, minVal=(-1.0), maxVal=1.0, repeats=inf|
+		var levels = this.env.levels.linlin(-1.0, 1.0, minVal, maxVal);
+		var times = this.env.times;
+		var curves = this.env.curves;
+		var c = if(curves.isSequenceableCollection.not) { curves } { Pseq(curves, inf) };
 
-		^Pseg.new(levels, durStretch * times, curves, repeats)
+		^Pseg.new(Pseq(levels, inf), durStretch * Pseq(times, inf), c, repeats)
 	}
 }
 
