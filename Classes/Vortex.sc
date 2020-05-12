@@ -130,11 +130,13 @@ VortexVoice{
 		^dict.env
 	}
 
-	pseg{|durStretch=1, minVal=(-1.0), maxVal=1.0, repeats=inf|
+	pseg{|durStretch=1, minVal=(-1.0), maxVal=1.0, reverse=false, repeats=inf|
 		var levels = this.env.levels.linlin(-1.0, 1.0, minVal, maxVal);
 		var times = this.env.times;
 		var curves = this.env.curves;
 		var c = if(curves.isSequenceableCollection.not) { curves } { Pseq(curves, inf) };
+
+		levels = if(reverse, { levels.reverse }, { levels });
 
 		^Pseg.new(Pseq(levels, inf), durStretch * Pseq(times, inf), c, repeats)
 	}
@@ -170,11 +172,6 @@ Vortex{
 	}
 }
 
-
-// Dynamically switch between fx chains
-// Uses Sleet to organize the fx themselves
-// Might be moved into Sleet itself
-FxPatcher{}
 
 // Networked computers providing extra audio muscle power
 NetworkedDevice{}
