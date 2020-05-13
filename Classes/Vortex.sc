@@ -32,6 +32,7 @@ VortexVoice{
 			nodeproxy: nil, // Sound process and mixer
 			lfos: [], // ?
 			analysis: [],
+			fxpatcher: nil
 		).postln;
 
 		// Data setup
@@ -42,6 +43,14 @@ VortexVoice{
 		this.initNodeproxy(fadeTime:1);
 		this.initDefaultFxPatch;
 		this.initTimemachine;
+
+		this.initFxpatcher;
+	}
+
+	initFxpatcher{
+		var defaultChain = [\delay, \pitchshift];
+		dict.fxpatcher = SleetPatcher.new(dict.nodeproxy, defaultChain, sleet);
+		^dict.fxpatcher
 	}
 
 	initNodeproxy{|fadeTime=1|
@@ -171,7 +180,6 @@ Vortex{
 
 	}
 }
-
 
 // Networked computers providing extra audio muscle power
 NetworkedDevice{}
