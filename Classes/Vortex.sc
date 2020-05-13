@@ -6,7 +6,6 @@ Dependencies:
 - Influx
 
 TODO:
-- dynamic fx patching
 
 IDEAS:
 - An event type for changing the influx via patterns
@@ -14,7 +13,19 @@ IDEAS:
 */
 
 VortexVoice{
-	var <>dict, <numChannels, sleet;
+	classvar <instances=0;
+	var <>dict, 
+	<numChannels, 
+	sleet, 
+
+	// Exclude from influx influence
+	excludeParams,
+
+	// Important indexes in the NodeProxy
+	mixIndex=10, // Mixers start here
+	fxIndex=100, // Fx chain starts here
+	timeIndex=1000, // Timemachine effect is here
+	protectionIndex=1001; // DC filter and limiter here;
 
 	*new { |numChans=2, time=8|
 		^super.new.init(numChans, time)
@@ -28,39 +39,55 @@ VortexVoice{
 		dict = (
 			influx: nil, // Influx
 			env: nil,	
-			timebuffer: Buffer.alloc(Server.local, 48000 * time, numChannels),
+			timebuffer: Buffer.alloc(Server.default, 48000 * time, numChannels),
 			nodeproxy: nil, // Sound process and mixer
 			lfos: [], // ?
 			analysis: [],
 			fxpatcher: nil
 		).postln;
 
+
+		instances = instances + 1;
+
+		// Nodeproxy setup
+		this.initNodeproxy(fadeTime:1);
+		this.initFxpatcher;
+		this.initTimemachine;
+
 		// Data setup
 		this.initInflux;
 		this.initDataWarping;
 
-		// Nodeproxy setup
-		this.initNodeproxy(fadeTime:1);
-		this.initDefaultFxPatch;
-		this.initTimemachine;
+	}
 
-		this.initFxpatcher;
+	// TODO
+	exclusionParams{
+		var protection = "wet%".format(protectionIndex).asSymbol;
+		var invol = \invol;
+		var in = \in;
+
+		excludeParams = [in, protection, invol];
+
+		^excludeParams
 	}
 
 	initFxpatcher{
 		var defaultChain = [\delay, \pitchshift];
-		dict.fxpatcher = SleetPatcher.new(dict.nodeproxy, defaultChain, sleet);
+		dict.fxpatcher = SleetPatcher.new(dict.nodeproxy, defaultChain, fxIndex);
 		^dict.fxpatcher
 	}
 
 	initNodeproxy{|fadeTime=1|
-		// Initialise nodeproxy
-		dict.nodeproxy = NodeProxy.new(
-			server: Server.default,  
-			rate: 'audio',  
-			numChannels: numChannels
-		);
 
+		// Initialise nodeproxy
+		// dict.nodeproxy = NodeProxy.new(
+		// 	server: Server.default,  
+		// 	rate: 'audio',  
+		// 	numChannels: numChannels
+		// );
+
+		dict.nodeproxy = Ndef("vortex_voice%".format(instances).asSymbol);
+		dict.nodeproxy.mold(numChannels, 'audio');
 		dict.nodeproxy.fadeTime_(fadeTime);
 
 		// // Add source sound function
@@ -68,21 +95,15 @@ VortexVoice{
 	}
 
 	defaultSource {
-		^{|in=#[ 0, 0 ], invol=0.4|
+		^{|in=#[ 0, 0 ], invol=0.75|
 			SoundIn.ar(in, invol)
-		};
-	}
-
-
-	// TODO
-	initDefaultFxPatch{
-
+		}
 	}
 
 	initTimemachine{
 		var timeSlot = 1001;
 		var initPlayrate = rrand(0.1,1.0);
-		var recordOnInit = 0.0;
+		var recordOnInit = 1.0;
 
 		// Add timemachine function to nodeproxy 
 		dict.nodeproxy[timeSlot] = \filter -> sleet.get('timemachine_ext');
@@ -96,7 +117,16 @@ VortexVoice{
 	}
 
 	initInflux{|ins=2, outs=8|
+		var params = dict.nodeproxy.controlKeys(except: this.exclusionParams);
 		dict.influx = Influx.new(ins, outs);
+		
+		// Set default range
+		// dict.influx;
+		// Attach to NodeProxy
+		dict.influx.attachMapped(
+			dict.nodeproxy, 
+			paramNames: params
+		)
 	}
 
 	// Reappropriated from Alberto De Campo's example included in the Influx package
@@ -127,6 +157,10 @@ VortexVoice{
 	}
 
 	// Getter functions
+	influx{
+		^dict.influx
+	}
+
 	timebuffer{
 		^dict.timebuffer
 	}
