@@ -99,7 +99,7 @@ VortexVoice{
 			"Vortex patching step done".postln;
 
 			// Data setup
-			this.initInflux.initDataWarping;
+			this.initInflux;
 			thisServer.sync;
 			"Influx init step done".postln;
 
@@ -205,7 +205,10 @@ VortexVoice{
 
 	initInflux{|ins=2, outs=32|
 		var params = this.okParams;
-		dict.influx = VortexFlux.new(ins, outs);
+		dict.influx = VortexFlux.new(
+			ins, 
+			outs
+		).initDataWarping;
 		dict.env = dict.influx.env;
 		
 		// Set default range
@@ -225,6 +228,10 @@ VortexVoice{
 
 	stop{
 		^dict.nodeproxy.stop
+	}
+
+	set{|...args|
+		^dict.influx.set(*args)
 	}
 
 	// Save buffer contents to file
