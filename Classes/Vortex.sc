@@ -12,6 +12,15 @@ IDEAS:
 
 */
 
+
+/*
+
+TODO:
+- LFOs
+- Analysis
+
+*/
+
 VortexVoice{
 	classvar <instances=0, <voices;
 	var <>dict, 
@@ -33,11 +42,11 @@ VortexVoice{
 		^super.new.init(voicename, numChans, time)
 	}
 
-	initClass{
-		voices = [];
-	}
-
 	init{|voicename, numChans, time|
+
+		// Global dictionary for voice management
+		voices = voices ?? ();
+
 		numChannels = numChans;
 		sleet = Sleet.new(numChannels: numChannels);
 
@@ -68,7 +77,8 @@ VortexVoice{
 		this.initDataWarping;
 
 		// Add to global directory
-		voices = voices.add(this);
+		voices.class.postln;
+		voices.put(name.asSymbol, this);
 
 		^this
 	}
