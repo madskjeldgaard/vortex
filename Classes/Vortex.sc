@@ -71,6 +71,7 @@ VortexVoice{
 		this.initNodeproxy(fadeTime:1);
 		this.initFxpatcher;
 		this.initTimemachine;
+		// this.initProtection;
 
 		// Data setup
 		this.initInflux;
@@ -88,7 +89,12 @@ VortexVoice{
 		var invol = \invol;
 		var in = \in;
 
-		excludeParams = [in, protection, invol];
+		excludeParams = [
+			in, 
+			protection, \limiterlevel, \limiterdur,
+			\record,
+			invol
+		];
 
 		^excludeParams
 	}
@@ -142,6 +148,13 @@ VortexVoice{
 			\record, recordOnInit, 
 			\buffer, dict.timebuffer
 		);
+	}
+
+	initProtection{
+		dict.nodeproxy[protectionIndex] = \filter -> {|in, limiterlevel=0.95, limiterdur=0.01|
+			LeakDC.ar(Limiter.ar(in, limiterlevel, limiterdur))
+
+		}
 	}
 
 	initInflux{|ins=2, outs=32|
