@@ -1,4 +1,3 @@
-// Organize Influx stuff here
 VortexFlux : Influx{
 	var <env;
 
@@ -44,5 +43,55 @@ VortexFlux : Influx{
 		levels = if(reverse, { levels.reverse }, { levels });
 
 		^Pseg.new(Pseq(levels, inf), durStretch * Pseq(times, inf), c, repeats)
+	}
+
+	gui{
+		^InfluxTestGui.new(this)
+	}
+}
+
+InfluxTestGui{
+
+	*new { |influx|
+		^super.new.init(influx)
+	}
+
+	init{|influx|
+
+		var w = Window.new("InfluxTestGui");
+		var insliders = influx.inNames.collect{|inname| 
+			Slider.new.action_({|obj|
+				var val = obj.value;
+				influx.set(inname, val.unibi)
+			})
+		};
+
+		var sliders = influx.outNames.collect{|outname| 
+			// VLayout(
+			// 	StaticText.new.string_("out %".format(outname)), Slider.new
+			// ) 
+			Slider.new
+		};
+		var layout = VLayout(
+			StaticText.new.string_("Influx inputs"),
+			VLayout.new(*insliders),
+
+			StaticText.new.string_("Influx outputs"),
+			HLayout.new(*sliders)
+		);
+
+		w.layout = layout;
+
+		w.front;
+
+		// Add actions to influx
+
+		influx.action.add(\setSliders, {|i|
+			var vals = i.outValDict;
+
+			vals.keysValuesDo{|key, value, valuenum|
+				sliders[valuenum].value = value.biuni
+			}
+		})
 	}
 }
