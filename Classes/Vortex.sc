@@ -21,9 +21,6 @@ TODO:
 
 */
 
-// Organize Influx stuff here
-VortexFlux : Influx{}
-
 VortexVoice{
 	classvar <instances=0, <voices;
 	var <>dict, 
@@ -102,8 +99,7 @@ VortexVoice{
 			"Vortex patching step done".postln;
 
 			// Data setup
-			this.initInflux;
-			this.initDataWarping;
+			this.initInflux.initDataWarping;
 			thisServer.sync;
 			"Influx init step done".postln;
 
@@ -160,14 +156,6 @@ VortexVoice{
 	}
 
 	initNodeproxy{|fadeTime=1|
-
-		// Initialise nodeproxy
-		// dict.nodeproxy = NodeProxy.new(
-		// 	server: Server.default,  
-		// 	rate: 'audio',  
-		// 	numChannels: numChannels
-		// );
-
 		dict.nodeproxy = Ndef(name);
 		dict.nodeproxy.mold(numChannels, 'audio');
 		dict.nodeproxy.fadeTime_(fadeTime);
@@ -217,7 +205,8 @@ VortexVoice{
 
 	initInflux{|ins=2, outs=32|
 		var params = this.okParams;
-		dict.influx = Influx.new(ins, outs);
+		dict.influx = VortexFlux.new(ins, outs);
+		dict.env = dict.influx.env;
 		
 		// Set default range
 		// dict.influx;
@@ -225,38 +214,11 @@ VortexVoice{
 		dict.influx.attachMapped(
 			dict.nodeproxy, 
 			paramNames: params
-		)
+		);
+
+		^dict.influx
 	}
-
-	// Reappropriated from Alberto De Campo's example included in the Influx package
-	warpingEnv{ |numSteps = 8, rand = 1.0, maxCurve = 3.0|
-		var numTimes = numSteps.max(2).round(2).asInteger;
-		var levels = (numTimes + 1).collect { |i| 1.0.rand2.blend( (i / numTimes).unibi, 1-rand) };
-		// bit boring to have them regular
-		var times = (1/numTimes).dup(numTimes);
-		var curves = numTimes.collect { maxCurve.rand2 };
-		// put in fixed values
-		levels[0] = -1;
-		levels[numTimes div: 2] = 0;
-		levels[numTimes] = 1;
-
-		^Env(levels, times, curves);
-	}
-
-	initDataWarping{
-		this.regenerateEnv;
-		dict.influx.addProc(\base, {|val|
-			dict.env.at(val.biuni)
-		});
-	}
-
-	regenerateEnv{|numSteps = 8, rand = 1.0, maxCurve = 3.0|
-		dict.env = this.warpingEnv(numSteps: numSteps, rand: rand, maxCurve: maxCurve);
-		^dict.env
-	}
-
 	// Convenience functions
-
 	play{
 		^dict.nodeproxy.play
 	}
@@ -317,16 +279,6 @@ VortexVoice{
 		}
 	}
 
-	pseg{|durStretch=1, minVal=(-1.0), maxVal=1.0, reverse=false, repeats=inf|
-		var levels = this.env.levels.linlin(-1.0, 1.0, minVal, maxVal);
-		var times = this.env.times;
-		var curves = this.env.curves;
-		var c = if(curves.isSequenceableCollection.not) { curves } { Pseq(curves, inf) };
-
-		levels = if(reverse, { levels.reverse }, { levels });
-
-		^Pseg.new(Pseq(levels, inf), durStretch * Pseq(times, inf), c, repeats)
-	}
 }
 
 // Main interface
