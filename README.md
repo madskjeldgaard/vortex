@@ -53,7 +53,7 @@ Uses a fork of Alberto de Campo's brilliant Influx package. The basic idea is to
 
 In stead of letting input data be mapped directly (but weighted) to outputs, the weighted data is used as pointers in a trajectory alloted to each voice. This means that turning a control from 0.0 to 1.0 will pass through valleys and peaks in a path, sort of like a wavetable index.
 
-The same trajectory may be used on all three time scales discussed elsewhere.
+The same trajectory may be used on all three time scales discussed elsewhere, and as such a valley or a peak may be as short as a second or as long as an hour.
 
 ### Multimodal
 ![controllers](/documentation/vortex_controllers.JPG)
