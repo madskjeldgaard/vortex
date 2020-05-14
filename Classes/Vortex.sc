@@ -148,6 +148,11 @@ VortexVoice{
 		);
 	}
 
+	// Param formatting
+	p {|name, index|
+		^"%%".format(name, index).asSymbol
+	}
+
 	initFxpatcher{
 		var defaultChain = [\delay, \pitchshift];
 		dict.fxpatcher = SleetPatcher.new(dict.nodeproxy, defaultChain, fxIndex);
@@ -201,11 +206,6 @@ VortexVoice{
 			record, recordOnInit, 
 			buffer, dict.timebuffer
 		);
-	}
-
-	// Param formatting
-	p {|name, index|
-		^"%%".format(name, index).asSymbol
 	}
 
 	initProtection{
@@ -306,6 +306,15 @@ VortexVoice{
 	 
 	env{
 		^dict.env
+	}
+
+	status{
+		"Status of %".format(name).postln;
+		dict.nodeproxy.getKeysValues.do{|argument| 
+			var k = argument[0];
+			var v = argument[1];
+			"\t%: %".format(k, v).postln
+		}
 	}
 
 	pseg{|durStretch=1, minVal=(-1.0), maxVal=1.0, reverse=false, repeats=inf|
