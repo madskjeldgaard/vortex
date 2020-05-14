@@ -53,7 +53,7 @@ VortexVoice{
 			lfos: [], // ?
 			analysis: [],
 			fxpatcher: nil
-		).postln;
+		);
 
 
 		instances = instances + 1;
@@ -86,7 +86,7 @@ VortexVoice{
 	okParams{
 		^dict.nodeproxy.controlKeys(
 			except: this.exclusionParams
-		).postln;
+		);
 	}
 
 	initFxpatcher{
