@@ -13,10 +13,12 @@ IDEAS:
 */
 
 VortexVoice{
-	classvar <instances=0;
+	classvar <instances=0, <voices;
 	var <>dict, 
 	<numChannels, 
 	sleet, 
+
+	<name,
 
 	// Exclude from influx influence
 	excludeParams,
@@ -27,16 +29,23 @@ VortexVoice{
 	timeIndex=1000, // Timemachine effect is here
 	protectionIndex=1001; // DC filter and limiter here;
 
-	*new { |numChans=2, time=8|
-		^super.new.init(numChans, time)
+	*new { |voicename, numChans=2, time=8|
+		^super.new.init(voicename, numChans, time)
 	}
 
-	init{|numChans, time|
+	initClass{
+		voices = [];
+	}
+
+	init{|voicename, numChans, time|
 		numChannels = numChans;
 		sleet = Sleet.new(numChannels: numChannels);
 
+		name = voicename ?? "vortvoice%".format(instances).asSymbol;
+
 		// Everything is stored here
 		dict = (
+			name: name,
 			influx: nil, // Influx
 			env: nil,	
 			timebuffer: Buffer.alloc(Server.default, 48000 * time, numChannels),
@@ -58,9 +67,12 @@ VortexVoice{
 		this.initInflux;
 		this.initDataWarping;
 
+		// Add to global directory
+		voices = voices.add(this);
+
+		^this
 	}
 
-	// TODO
 	exclusionParams{
 		var protection = "wet%".format(protectionIndex).asSymbol;
 		var invol = \invol;
@@ -69,6 +81,12 @@ VortexVoice{
 		excludeParams = [in, protection, invol];
 
 		^excludeParams
+	}
+
+	okParams{
+		^dict.nodeproxy.controlKeys(
+			except: this.exclusionParams
+		).postln;
 	}
 
 	initFxpatcher{
@@ -86,7 +104,7 @@ VortexVoice{
 		// 	numChannels: numChannels
 		// );
 
-		dict.nodeproxy = Ndef("vortex_voice%".format(instances).asSymbol);
+		dict.nodeproxy = Ndef(name);
 		dict.nodeproxy.mold(numChannels, 'audio');
 		dict.nodeproxy.fadeTime_(fadeTime);
 
@@ -106,7 +124,7 @@ VortexVoice{
 		var recordOnInit = 1.0;
 
 		// Add timemachine function to nodeproxy 
-		dict.nodeproxy[timeSlot] = \filter -> sleet.get('timemachine_ext');
+		dict.nodeproxy[timeSlot] = \kfilter -> sleet.get('timemachine_ext');
 
 		// Initial settings
 		dict.nodeproxy.set(
@@ -116,8 +134,8 @@ VortexVoice{
 		);
 	}
 
-	initInflux{|ins=2, outs=8|
-		var params = dict.nodeproxy.controlKeys(except: this.exclusionParams);
+	initInflux{|ins=2, outs=32|
+		var params = this.okParams;
 		dict.influx = Influx.new(ins, outs);
 		
 		// Set default range
