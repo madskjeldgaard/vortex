@@ -1,6 +1,3 @@
-/*
-*/
-
 // TODO
 // Base class
 Vortex{

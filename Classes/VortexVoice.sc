@@ -32,10 +32,6 @@ VortexVoice{
 	*new { |server, voicename, numChans=2, time=8|
 		^super.new.init(server, voicename, numChans, time)
 	}
-
-	// TODO
-	*writeAll{}
-
 	init{|server, voicename, numChans, time|
 
 		// Global dictionary for voice management
@@ -135,7 +131,7 @@ VortexVoice{
 	}
 
 	initFxpatcher{
-		var defaultChain = [\delay, \pitchshift];
+		var defaultChain = [\delay, \pitchshift, \delay, \freqshift, \delay];
 		dict.fxpatcher = SleetPatcher.new(dict.nodeproxy, defaultChain, fxIndex);
 		^dict.fxpatcher
 	}
@@ -220,10 +216,23 @@ VortexVoice{
 	}
 
 	// Save buffer contents to file
-	write{|to="~"|
+	vortexRecordingsDir{
+		var p = Platform.recordingsDir +/+ "vortex";
+
+		PathName(p).isFolder.if({
+			"touch %/yo.txt".format(p).unixCmdGetStdOut.postln 
+		},{
+			"mkdir %".format(p).unixCmdGetStdOut.postln 
+		});
+
+		^p
+	}
+
+	write{|to|
 		var filename = "%_timebuffer_%.wav".format(name, Date.getDate.stamp);
 
 		// Resolve path
+		to = to ?? this.vortexRecordingsDir;
 		to = to.asAbsolutePath;
 
 		// Make filename 
@@ -232,6 +241,12 @@ VortexVoice{
 		"Saving timebuffer: %".format(to).postln;
 
 		dict.timebuffer.write(to, headerFormat: "wav")
+	}
+
+	*writeAll{|to|
+		this.voices.do{|v|
+			v.write(to)
+		}
 	}
 
 	plotTime{
