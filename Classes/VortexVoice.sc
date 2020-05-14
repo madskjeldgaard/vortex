@@ -19,10 +19,6 @@ VortexVoice{
 	excludeParams,
 
 	// Important indexes in the NodeProxy
-	mixIndex=10, // Mixers start here
-	fxIndex=100, // Fx chain starts here
-	timeIndex=1000, // Timemachine effect is here
-	protectionIndex=1001; // DC filter and limiter here;
 	<mixIndex=10, // Mixers start here
 	<fxIndex=100, // Fx chain starts here
 	<timeIndex=1000, // Timemachine effect is here
@@ -217,6 +213,18 @@ VortexVoice{
 
 	set{|...args|
 		^dict.influx.set(*args)
+	}
+
+	startRecording{
+		var recordparam = this.p("record", timeIndex);
+		dict.nodeproxy.set(recordparam, 1.0);
+		"Started recording in %".format(name).postln;
+	}
+
+	stopRecording{
+		var recordparam = this.p("record", timeIndex);
+		dict.nodeproxy.set(recordparam, 0.0);
+		"Stopped recording in %".format(name).postln;
 	}
 
 	// Save buffer contents to file
