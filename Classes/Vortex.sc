@@ -65,7 +65,7 @@ VortexVoice{
 			name: name,
 			influx: nil, // Influx
 			env: nil,	
-			timebuffer: Buffer.alloc(Server.default, 48000 * time, numChannels),
+			timebuffer: nil,
 			nodeproxy: nil, // Sound process and mixer
 			lfos: [], // ?
 			analysis: [],
@@ -75,6 +75,7 @@ VortexVoice{
 		instances = instances + 1;
 
 		// Nodeproxy setup
+		this.allocBuf(time: time, sampleRate: 48000);
 		this.initNodeproxy(fadeTime:1);
 		this.initFxpatcher;
 		this.initTimemachine;
@@ -89,6 +90,12 @@ VortexVoice{
 		voices.put(name.asSymbol, this);
 
 		^this
+	}
+
+	allocBuf{|time=16, sampleRate=48000|
+		var buf = Buffer.alloc(Server.default, sampleRate * time, numChannels);
+
+		dict.timebuffer = buf;
 	}
 
 	exclusionParams{
@@ -157,6 +164,12 @@ VortexVoice{
 		timerate = this.p("timerate", timeIndex);
 		record = this.p("record", timeIndex);
 		buffer = this.p("buffer", timeIndex);
+		/*
+
+		TODO:
+		MAKE SURE SERVER IS BOOTED + BUFFER ALLOCATED
+		*/
+
 
 		dict.nodeproxy.set(
 			timerate, initPlayrate, 
