@@ -29,6 +29,7 @@ VortexVoice{
 	var <>dict, 
 	<numChannels, 
 	sleet, 
+	<thisServer,
 
 	<name,
 
@@ -46,21 +47,24 @@ VortexVoice{
 		Class.initClassTree(Sleet);
 	} 
 
-	*new { |voicename, numChans=2, time=8|
-		^super.new.init(voicename, numChans, time)
+	*new { |server, voicename, numChans=2, time=8|
+		^super.new.init(server, voicename, numChans, time)
 	}
 
-	init{|voicename, numChans, time|
+	// TODO
+	*writeAll{}
+
+	init{|server, voicename, numChans, time|
 
 		// Global dictionary for voice management
 		voices = voices ?? ();
 
+		thisServer = server ?? Server.default;
 		numChannels = numChans;
-		sleet = Sleet.new(numChannels: numChannels);
-
 		name = voicename ?? "vortvoice%".format(instances).asSymbol;
+		instances = instances + 1;
 
-		// Everything is stored here
+		// Local dictionary 
 		dict = (
 			name: name,
 			influx: nil, // Influx
@@ -72,30 +76,51 @@ VortexVoice{
 			fxpatcher: nil
 		);
 
-		instances = instances + 1;
 
-		// Nodeproxy setup
-		this.allocBuf(time: time, sampleRate: 48000);
-		this.initNodeproxy(fadeTime:1);
-		this.initFxpatcher;
-		this.initTimemachine;
-		this.initProtection;
+		// Make bundle to make sure everything happens in order
+		fork{
+			thisServer.sync;
 
-		// Data setup
-		this.initInflux;
-		this.initDataWarping;
+			sleet = Sleet.new(numChannels: numChannels);
+			thisServer.sync;
 
-		// Add to global directory
-		voices.class.postln;
-		voices.put(name.asSymbol, this);
+			// Allocate time buffer. This can be finicky: If not done before
+			// initializing Ndef, problems may arise
+			this.allocBuf(time: time, sampleRate: 48000);
+			thisServer.sync;
+			"Buffer allocation step done".postln;
+
+			// Nodeproxy setup
+			this.initNodeproxy(fadeTime:1);
+			thisServer.sync;
+			"Nodeproxy init step done".postln;
+
+			this.initFxpatcher;
+			this.initTimemachine;
+			this.initProtection;
+			thisServer.sync;
+			"Vortex patching step done".postln;
+
+			// Data setup
+			this.initInflux;
+			this.initDataWarping;
+			thisServer.sync;
+			"Influx init step done".postln;
+
+			// Add to global directory
+			voices.put(name.asSymbol, this);
+
+		};
 
 		^this
 	}
 
 	allocBuf{|time=16, sampleRate=48000|
-		var buf = Buffer.alloc(Server.default, sampleRate * time, numChannels);
+		var buf = Buffer.alloc(thisServer, sampleRate * time, numChannels ?? 2);
 
 		dict.timebuffer = buf;
+
+		^buf	
 	}
 
 	exclusionParams{
@@ -164,8 +189,8 @@ VortexVoice{
 		timerate = this.p("timerate", timeIndex);
 		record = this.p("record", timeIndex);
 		buffer = this.p("buffer", timeIndex);
-		/*
 
+		/*
 		TODO:
 		MAKE SURE SERVER IS BOOTED + BUFFER ALLOCATED
 		*/
@@ -180,7 +205,7 @@ VortexVoice{
 
 	// Param formatting
 	p {|name, index|
-		^"name%".format(index).asSymbol
+		^"%%".format(name, index).asSymbol
 	}
 
 	initProtection{
