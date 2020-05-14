@@ -23,6 +23,10 @@ VortexVoice{
 	fxIndex=100, // Fx chain starts here
 	timeIndex=1000, // Timemachine effect is here
 	protectionIndex=1001; // DC filter and limiter here;
+	<mixIndex=10, // Mixers start here
+	<fxIndex=100, // Fx chain starts here
+	<timeIndex=1000, // Timemachine effect is here
+	<protectionIndex=1001; // DC filter and limiter here;
 
 	*initClass{
 		Class.initClassTree(KFilter);
