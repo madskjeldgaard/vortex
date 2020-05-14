@@ -21,6 +21,9 @@ TODO:
 
 */
 
+// Organize Influx stuff here
+VortexFlux : Influx{}
+
 VortexVoice{
 	classvar <instances=0, <voices;
 	var <>dict, 
@@ -37,6 +40,11 @@ VortexVoice{
 	fxIndex=100, // Fx chain starts here
 	timeIndex=1000, // Timemachine effect is here
 	protectionIndex=1001; // DC filter and limiter here;
+
+	*initClass{
+		Class.initClassTree(KFilter);
+		Class.initClassTree(Sleet);
+	} 
 
 	*new { |voicename, numChans=2, time=8|
 		^super.new.init(voicename, numChans, time)
@@ -64,7 +72,6 @@ VortexVoice{
 			fxpatcher: nil
 		);
 
-
 		instances = instances + 1;
 
 		// Nodeproxy setup
@@ -89,10 +96,14 @@ VortexVoice{
 		var invol = \invol;
 		var in = \in;
 
+		var record = this.p("record", timeIndex);
+		var buffer = this.p("buffer", timeIndex);
+
 		excludeParams = [
 			in, 
 			protection, \limiterlevel, \limiterdur,
-			\record,
+			record,
+			buffer,
 			invol
 		];
 
@@ -135,19 +146,28 @@ VortexVoice{
 	}
 
 	initTimemachine{
-		var timeSlot = 1001;
 		var initPlayrate = rrand(0.1,1.0);
 		var recordOnInit = 1.0;
+		var timerate, record, buffer;
 
 		// Add timemachine function to nodeproxy 
-		dict.nodeproxy[timeSlot] = \kfilter -> sleet.get('timemachine_ext');
+		dict.nodeproxy[timeIndex] = \kfilter -> sleet.get('timemachine_ext');
 
 		// Initial settings
+		timerate = this.p("timerate", timeIndex);
+		record = this.p("record", timeIndex);
+		buffer = this.p("buffer", timeIndex);
+
 		dict.nodeproxy.set(
-			\timerate, initPlayrate, 
-			\record, recordOnInit, 
-			\buffer, dict.timebuffer
+			timerate, initPlayrate, 
+			record, recordOnInit, 
+			buffer, dict.timebuffer
 		);
+	}
+
+	// Param formatting
+	p {|name, index|
+		^"name%".format(index).asSymbol
 	}
 
 	initProtection{
@@ -197,7 +217,43 @@ VortexVoice{
 		^dict.env
 	}
 
-	// Getter functions
+	// Convenience functions
+
+	play{
+		^dict.nodeproxy.play
+	}
+
+	stop{
+		^dict.nodeproxy.stop
+	}
+
+	// Save buffer contents to file
+	write{|to="~"|
+		var filename = "%_timebuffer_%.wav".format(name, Date.getDate.stamp);
+
+		// Resolve path
+		to = to.asAbsolutePath;
+
+		// Make filename 
+		to = to +/+ filename;
+
+		"Saving timebuffer: %".format(to).postln;
+
+		dict.timebuffer.write(to, headerFormat: "wav")
+	}
+
+	plotTime{
+		dict.timebuffer.plot
+	}
+
+	plotEnv{
+		dict.env.plot
+	}
+
+	testEnv{
+		dict.env.test
+	}
+
 	influx{
 		^dict.influx
 	}
