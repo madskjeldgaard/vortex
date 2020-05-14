@@ -71,7 +71,7 @@ VortexVoice{
 		this.initNodeproxy(fadeTime:1);
 		this.initFxpatcher;
 		this.initTimemachine;
-		// this.initProtection;
+		this.initProtection;
 
 		// Data setup
 		this.initInflux;
