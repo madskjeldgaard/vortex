@@ -1,5 +1,4 @@
 (
-
 s.waitForBoot{
 	// TODO: HACKY
 	InfluxBase.baseSpec = [0.0,1.0].asSpec;

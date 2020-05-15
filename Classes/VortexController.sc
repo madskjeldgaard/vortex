@@ -1,4 +1,17 @@
 // TODO
+VortexController{
+	var <voice, modalitycontroller;
+
+	*new { | voice, modalitycontroller |
+		^super.newCopyArgs(voice, modalitycontroller).init(voice, modalitycontroller)
+	}
+
+	init { | voice, modalitycontroller |
+
+	}
+
+}
+
 
 // Make a Modality device button blink in random pattern (to show that it's alive)
 VortexButtonBlinker{
