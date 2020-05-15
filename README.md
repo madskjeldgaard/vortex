@@ -8,7 +8,7 @@ It is inspired by reel to reel tape recorders, cybernetic and feedback music as 
 
 At it's core it has a complex web of sound processes divided in voices, all of them interconnected in feedback paths.
 
-The interface for Vortex is a simple to use but esoteric API which obscures the complexity and makes it easy to influence, but hard or impossible to control. In other words: 's a black box.
+The interface for Vortex is a simple to use but esoteric API which obscures the complexity and makes it easy to influence, but hard or impossible to control. In other words: it's a black box.
 
 One of the main ideas is to have a performers movements cause effects on three different time scales:
 1. The immediate
@@ -20,7 +20,7 @@ The name is meant to illustrate the fact that there is a continuous, turbulent f
 You can hear a very early prototype of this system [by clicking this link](http://mads-kjeldgaard.bandcamp.com/track/discussions-with-geographical-entities)
 
 ## Inspirations
-- Cyberneticism
+- Cybernetics
 - Reel to reel tape recorder instruments (Long varispeed loops + Sound reinjection)
 
 Inspirations:
@@ -29,8 +29,6 @@ Inspirations:
 [Giovanni Lami](https://vimeo.com/238351530)
 
 ## Design goals
-![vortex](/documentation/vortex_blackbox.jpg)
-
 ### Interface
 - Black box style: Complexity is hidden behind very simple interface. 
 - Lose control, gain influence (Alberto de Campo)
