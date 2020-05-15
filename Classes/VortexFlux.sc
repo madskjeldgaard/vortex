@@ -1,8 +1,17 @@
 VortexFlux : Influx{
+	// classvar baseSpec;
 	var <env;
 
+	*initClass{
+		Class.initClassTree(Spec);
+		outNameOrder = [23, 24, 25] ++ (22, 21 .. 0);
+
+		// Change base spec from -1.0-1.0 to 0.0 to 1.0 to fit with Sleet parameter normalization
+		baseSpec = [0.0,1.0].asSpec;
+	}
+
 	// Reappropriated from Alberto De Campo's example included in the Influx package
-	warpingEnv{ |numSteps = 8, rand = 1.0, maxCurve = 3.0|
+	warpingEnv{ |numSteps = 64, rand = 1.0, maxCurve = 3.0|
 		var numTimes = numSteps.max(2).round(2).asInteger;
 		var levels = (numTimes + 1).collect { |i| 1.0.rand2.blend( (i / numTimes).unibi, 1-rand) };
 		// bit boring to have them regular
