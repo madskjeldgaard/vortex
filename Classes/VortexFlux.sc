@@ -2,8 +2,10 @@ VortexFlux : Influx{
 	// classvar baseSpec;
 	var <env;
 
+	// Overwriting this class method from Influx to change baseSpec
 	*initClass{
 		Class.initClassTree(Spec);
+		Class.initClassTree(Influx);
 		outNameOrder = [23, 24, 25] ++ (22, 21 .. 0);
 
 		// Change base spec from -1.0-1.0 to 0.0 to 1.0 to fit with Sleet parameter normalization
