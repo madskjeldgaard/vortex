@@ -10,7 +10,10 @@ At it's core it has a complex web of sound processes divided in voices, all of t
 The name is meant to illustrate the fact that there is a continuous, turbulent flow and that the sounds and movements of the performer disappear in this fluid motion.
 
 ## About this repository
-The system is open sourced and liberally licensed for anyone to be inspired by. That said, it is a work in progress and designed specifically for the author's own work flow so please don't expect any support :) 
+
+For now, this repository is mostly for documentation purposes and for anyone else to be inspired by.
+
+That said, it is a work in progress and designed specifically for the author's own work flow so please don't expect any support if you mess around with it yourself (but please go ahead and do so). It is organized as a SuperCollider Quark, making it easy to install. 
 
 ## VortexFlux: Trajectories and control data warping
 ![trajectory](documentation/trajectory.png)
