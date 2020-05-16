@@ -9,6 +9,8 @@ At it's core it has a complex web of sound processes divided in voices, all of t
 
 The name is meant to illustrate the fact that there is a continuous, turbulent flow and that the sounds and movements of the performer disappear in this fluid motion.
 
+## About this repository
+The system is open sourced and liberally licensed for anyone to be inspired by. That said, it is a work in progress and designed specifically for the author's own work flow so please don't expect any support :) 
 
 ## VortexFlux: Trajectories and control data warping
 ![trajectory](documentation/trajectory.png)
