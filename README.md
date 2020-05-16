@@ -15,20 +15,6 @@ For now, this repository is mostly for documentation purposes and for anyone els
 
 That said, it is a work in progress and designed specifically for the author's own work flow so please don't expect any support if you mess around with it yourself (but please go ahead and do so). It is organized as a SuperCollider Quark, making it easy to install. 
 
-## VortexFlux: Trajectories and control data warping
-![trajectory](documentation/trajectory.png)
-
-In stead of letting input data be mapped directly (but weighted) to outputs, the weighted data is used as pointers in a trajectory alloted to each voice. This means that turning a control from 0.0 to 1.0 will pass through valleys and peaks in a path, sort of like a wavetable index:
-
-![vortexflux](documentation/vortexflux2.gif)
-
-Vortex uses a fork of Alberto de Campo's brilliant Influx package for control warping and multiplication. 
-
-The basic idea is to take an input, multiply it by weights and spread it to multiple outputs. This is an extremely powerful idea that can transform a simple input (usually one or two inputs) to many differing outputs.
-
-[This article explains the idea nicely](https://www.3dmin.org/research/open-development-and-design/influx/)
-
-
 ## VortexVoice
 ![vortex](documentation/vortex_voice.jpg)
 
@@ -53,3 +39,15 @@ All effect chains are managed using the [Sleet](https://github.com/madskjeldgaar
 This both serves as a library for sound effect algorithms and an infrastructure for quickly organizing and changing effects. 
 In the case of Vortex, this is done primarily using SuperCollider's [nodeproxy role](http://doc.sccode.org/Reference/NodeProxy_roles.html) feature.
 
+## VortexFlux: Trajectories and control data warping
+![trajectory](documentation/trajectory.png)
+
+In stead of letting input data be mapped directly (but weighted) to outputs, the weighted data is used as pointers in a trajectory alloted to each voice. This means that turning a control from 0.0 to 1.0 will pass through valleys and peaks in a path, sort of like a wavetable index:
+
+![vortexflux](documentation/vortexflux2.gif)
+
+Vortex uses a fork of Alberto de Campo's brilliant Influx package for control warping and multiplication. 
+
+The basic idea is to take an input, multiply it by weights and spread it to multiple outputs. This is an extremely powerful idea that can transform a simple input (usually one or two inputs) to many differing outputs.
+
+[This article explains the idea nicely](https://www.3dmin.org/research/open-development-and-design/influx/)
