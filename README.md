@@ -51,3 +51,7 @@ Vortex uses a fork of Alberto de Campo's brilliant Influx package for control wa
 The basic idea is to take an input, multiply it by weights and spread it to multiple outputs. This is an extremely powerful idea that can transform a simple input (usually one or two inputs) to many differing outputs.
 
 [This article explains the idea nicely](https://www.3dmin.org/research/open-development-and-design/influx/)
+
+## Timebuffer
+
+The output of each Vortex voice is sent to a looping buffer recorder. This is the "varispeed looping tape reel". The buffer is externally available to be timestretched and manipulated further, it can also be saved to disk.
