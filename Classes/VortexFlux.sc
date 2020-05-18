@@ -56,6 +56,13 @@ VortexFlux : Influx{
 		^Pseg.new(Pseq(levels, inf), durStretch * Pseq(times, inf), c, repeats)
 	}
 
+	randomizeIns{|randMax=1.0|
+		this.inNames.do{|name|
+			var val = randMax.rand2;
+			this.set(name.asSymbol, val)
+		}
+	}	
+
 	gui{
 		^InfluxTestGui.new(this)
 	}
@@ -104,5 +111,9 @@ InfluxTestGui{
 				sliders[valuenum].value = value.biuni
 			}
 		})
+	}
+
+	reattach{
+
 	}
 }

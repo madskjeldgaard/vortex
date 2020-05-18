@@ -210,6 +210,10 @@ VortexVoice{
 		^dict.influx
 	}
 
+	rand{|randMax=1.0|
+		dict.influx.randomizeIns(randMax)
+	}	
+
 	reattach{
 		var params = this.okParams;
 

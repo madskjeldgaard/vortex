@@ -1,4 +1,3 @@
-// TODO
 Vortex{
 
 	*new { | server, numVortices=2, numChannels=2 |
@@ -12,6 +11,12 @@ Vortex{
 		};
 
 		this.mixVoices;
+	}
+
+	randAll{|randMax=1.0|
+		VortexVoice.voices.do{|voice|
+			voice.rand(randMax)
+		}
 	}
 
 	// Mix voices together
