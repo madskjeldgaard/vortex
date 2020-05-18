@@ -39,7 +39,10 @@ Vortex{
 
 				index = index + 1; // Start from 1 to not overwrite source
 				thisVoice.nodeproxy[index] = \mix -> { mixinVoice.nodeproxy.ar };
-			}
+			};
+
+			// Reattach influx
+			voice.reattach
 		}
 
 	}

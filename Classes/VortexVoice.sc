@@ -187,14 +187,16 @@ VortexVoice{
 
 	initInflux{|ins=2, outs=32|
 		var params = this.okParams;
+
+		// Create influx
 		dict.influx = VortexFlux.new(
 			ins, 
 			outs
 		).initDataWarping;
+
+		// Pointer to influx envelope
 		dict.env = dict.influx.env;
 		
-		// Set default range
-		// dict.influx;
 		// Attach to NodeProxy
 		dict.influx.attachMapped(
 			dict.nodeproxy, 
@@ -203,6 +205,18 @@ VortexVoice{
 
 		^dict.influx
 	}
+
+	reattach{
+		var params = this.okParams;
+
+		// Attach to NodeProxy
+		dict.influx.attachMapped(
+			dict.nodeproxy, 
+			paramNames: params
+		);
+
+	}
+
 	// Convenience functions
 	play{
 		^dict.nodeproxy.play
