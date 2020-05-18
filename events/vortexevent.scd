@@ -1,36 +1,22 @@
-/*
-- Event types for changing the influx via patterns
-*/
 (
+var events = ();
 
-// Play Vortex' timebuffers in events
-Event.addEventType(\vortexbuf, {|server|
+events.vortexbuf = {
 	~type = \note;
-	~buffer = voice.timebuffer;
+	// ~buffer = voice.timebuffer;
 
 	currentEnvironment.play;
-});
+};
 
-/*
-
-Test \vortexbuf
-
-Pbind(\type, \vortexbuf).play;
-
-*/
-
-// Set Vortex voice
-Event.addEventType(\vortexset, {|server|
+events.vortexset = {
 	~type = \note;
 	currentEnvironment.play;
-});
+};
 
-/*
+events.keysValuesDo{|name, ev|
+	"adding % event type".format(name).postln;
+	Event.addEventType(name.asSymbol, ev);
+};
 
-Test \vortexset
-
-Pbind(\type, \vortexset).play;
-
-*/
-
+events
 )

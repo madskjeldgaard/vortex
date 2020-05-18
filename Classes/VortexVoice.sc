@@ -27,6 +27,8 @@ VortexVoice{
 	*initClass{
 		Class.initClassTree(KFilter);
 		Class.initClassTree(Sleet);
+
+		
 	} 
 
 	*new { |server, voicename, numChans=2, time=8|
@@ -34,6 +36,8 @@ VortexVoice{
 	}
 
 	init{|server, voicename, numChans, time|
+		// Load vortex event types
+		VortexEvent.new;
 
 		// Global dictionary for voice management
 		voices = voices ?? ();
