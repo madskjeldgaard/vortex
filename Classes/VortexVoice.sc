@@ -32,6 +32,7 @@ VortexVoice{
 	*new { |server, voicename, numChans=2, time=8|
 		^super.new.init(server, voicename, numChans, time)
 	}
+
 	init{|server, voicename, numChans, time|
 
 		// Global dictionary for voice management
@@ -131,7 +132,7 @@ VortexVoice{
 	}
 
 	initFxpatcher{
-		var defaultChain = [\delay, \pitchshift, \delay, \freqshift, \delay];
+		var defaultChain = [\delay, \pitchshift, \chorus, \freqshift, \phaser];
 		dict.fxpatcher = SleetPatcher.new(dict.nodeproxy, defaultChain, fxIndex);
 		^dict.fxpatcher
 	}
@@ -279,6 +280,14 @@ VortexVoice{
 
 	timebuffer{
 		^dict.timebuffer
+	}
+
+	clearBuffer{
+		var buffer = dict.timebuffer;
+		var numFrames = buffer.numFrames;
+		buffer.sendCollection(Array.fill(numFrames, { 0 }));
+
+		^buffer
 	}
 	 
 	nodeproxy{
