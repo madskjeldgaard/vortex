@@ -15,6 +15,8 @@ VortexVoice{
 
 	<name,
 
+	<ocean,
+
 	// Exclude from influx influence
 	excludeParams,
 
@@ -31,11 +33,11 @@ VortexVoice{
 		
 	} 
 
-	*new { |server, voicename, numChans=2, time=8|
-		^super.new.init(server, voicename, numChans, time)
+	*new { |server, voicename, numChans=2, time=8, fluid=true|
+		^super.new.init(server, voicename, numChans, time, fluid)
 	}
 
-	init{|server, voicename, numChans, time|
+	init{|server, voicename, numChans, time, fluid|
 		// Load vortex event types
 		VortexEvent.new;
 
@@ -85,7 +87,7 @@ VortexVoice{
 			"Vortex patching step done".postln;
 
 			// Data setup
-			this.initInflux;
+			this.initInflux(ins:2, outs: 32, fluid: fluid);
 			thisServer.sync;
 			"Influx init step done".postln;
 
@@ -136,7 +138,7 @@ VortexVoice{
 	}
 
 	initFxpatcher{
-		var defaultChain = [\delay, \pitchshift, \chorus, \freqshift, \phaser];
+		var defaultChain = [\delay, \pitchshift, \chorus, \freqshift, \phaser, \filter];
 		dict.fxpatcher = SleetPatcher.new(dict.nodeproxy, defaultChain, fxIndex);
 		^dict.fxpatcher
 	}
@@ -189,7 +191,7 @@ VortexVoice{
 		}
 	}
 
-	initInflux{|ins=2, outs=32|
+	initInflux{|ins=2, outs=32, fluid=false|
 		var params = this.okParams;
 
 		// Create influx
@@ -202,11 +204,18 @@ VortexVoice{
 		dict.env = dict.influx.env;
 		
 		// Attach to NodeProxy
-		dict.influx.attachMapped(
-			dict.nodeproxy, 
-			paramNames: params
-		);
+		if(fluid, {
+			ocean = VortexOcean.new(dict.influx);
+			ocean.attachLfosMapped(dict.nodeproxy, paramNames: params)
+		}, {
+			dict.influx.attachMapped(
+				dict.nodeproxy, 
+				paramNames: params
+			);
 
+
+		})
+		
 		^dict.influx
 	}
 

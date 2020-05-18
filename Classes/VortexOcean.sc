@@ -33,16 +33,18 @@ VortexOcean{
 
 	makeLfo{|lfoNum=0|
 		var initPhase = 4pi.rand2;
-		var name = "vortex_fluid_lfo%".format(lfoNum).asSymbol;
+		var lfo = NodeProxy.new(rate: 'control',  numChannels: 1);
 
-		Ndef(name, {|freq=0.1, amp=1| 
-			SinOsc.kr(freq, initPhase, amp)
-		});
+		lfo.source = {|freq=0.1, amp=1| 
+			// SinOsc.kr(freq, initPhase, amp)
+			LFSaw.kr(freq, initPhase, amp)
+			// LFNoise2.kr(freq, amp)
+		};
 
-		^Ndef(name).set(\freq, 2.0.rand2);
+		^lfo.set(\freq, 0.015.rand2);
 	}
 
-	addToInflux{|influx|
+	addToInflux{|influx, freqScale = 0.1|
 		influx.action.add('setOcean', {|i|
 			var outVals = i.outValDict;
 
@@ -50,7 +52,7 @@ VortexOcean{
 				var modBy = if(lfos.size > outVals.size, { outVals.size }, { lfos.size });
 				var lfo = lfos[index % modBy];
 
-				lfo.set(\freq, value)
+				lfo.set(\freq, value * freqScale)
 			}
 		})
 	}
@@ -70,9 +72,10 @@ VortexOcean{
 
 		args = paramNames ? ndef.controlKeys;
 		argArray = args.collect{|a, argNum|
-			var lfo = lfos[argNum % lfos.size];
+			var lfoNum = argNum % lfos.size;
+			var lfo = lfos[lfoNum];
 
-			"Mapping lfo % to arg %".format(lfo.key, a).postln;
+			"Mapping lfo % to arg %".format(lfoNum, a).postln;
 
 			[a, lfo]
 		}; 
