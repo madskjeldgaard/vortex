@@ -97,16 +97,21 @@ VortexOcean{
 
 	}
 
+	// TODO
 	feedbackPatch{|lag=4|
 		"Applying feedback patch".postln;
+		fork{
+			lfos.do{|lfo, lfoNum|
+				// Filter out the lfo receiving the data from other lfo
+				var filteredlfos = lfos.reject({|thislfo, i| i == lfoNum});
+				var chosenlfo = filteredlfos.choose;
 
-		lfos.do{|lfo, lfoNum|
-			// Filter out the lfo receiving the data from other lfo
-			var filteredlfos = lfos.reject({|thislfo, i| i == lfoNum});
-			var chosenlfo = filteredlfos.choose;
+				Server.default.sync;
 
-			lfo.lag(\feedback, lag);
-			lfo.map(\feedback, chosenlfo)
+				lfo.lag(\feedback, lag);
+				lfo.map(\feedback, chosenlfo)
+			}
 		}
+
 	}
 }
