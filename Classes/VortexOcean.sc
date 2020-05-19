@@ -31,6 +31,7 @@ VortexOcean{
 
 		this.addToInflux(influx);
 
+		this.feedbackPatch;
 
 		^this
 	}
@@ -92,5 +93,16 @@ VortexOcean{
 
 		// lfos.do{|lfo, lfoNum| }
 
+	}
+
+	feedbackPatch{
+		lfos.do{|lfo, lfoNum|
+			// Filter out the lfo receiving the data from other lfo
+			var filteredlfos = lfos.reject({|thislfo, i| i == lfoNum});
+			var chosenlfo = filteredlfos.choose;
+
+			lfo.set(\freq, chosenlfo)
+
+		}
 	}
 }
