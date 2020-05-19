@@ -1,4 +1,5 @@
 Vortex{
+	var <voices;
 
 	*new { | server, numVortices=2, numChannels=2 |
 		^super.new.init(server, numVortices, numChannels)
@@ -10,22 +11,46 @@ Vortex{
 			VortexVoice.new(server,  voicename: nil,  numChans: numChannels,  time: 8)
 		};
 
+		voices = VortexVoice.voices;
+
 		this.mixVoices;
 	}
 
+	play{
+		voices.do{|v|
+			v.play
+		}
+	}
+
+	stop{
+		voices.do{|v|
+			v.stop
+		}
+	}
+
+	buffers{
+		var buffers = [];
+
+		voices.do{|v|
+			buffers = buffers.add(v.timebuffer)
+		};
+
+		^buffers
+	}
+
 	randAll{|randMax=1.0|
-		VortexVoice.voices.do{|voice|
-			voice.rand(randMax)
+		voices.do{|v|
+			v.rand(randMax)
 		}
 	}
 
 	// Mix voices together
 	mixVoices{
 		var voiceArray = [];
-		var numVoices = VortexVoice.voices.size;
+		var numVoices = voices.size;
 
 		// Convert to array for easier mixing
-		VortexVoice.voices.keysValuesDo{|voicename, voice, voxnum|
+		voices.keysValuesDo{|voicename, voice, voxnum|
 			voiceArray = voiceArray.add(voice);
 		};
 
