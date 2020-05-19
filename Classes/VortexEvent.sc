@@ -10,7 +10,7 @@ VortexEvent{
 		if(loaded.not, {
 			"Loading Vortex events ".postln;
 			loaded = true;
-			(classpath +/+ "events/vortexevent.scd").load;
+			(classpath +/+ "lib/vortexevent.scd").load;
 		}, {
 			"Vortex events already loaded".postln;
 		})
