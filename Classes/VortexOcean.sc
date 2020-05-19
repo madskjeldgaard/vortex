@@ -13,11 +13,11 @@ o.attachLfosMapped(Ndef(\yoyo));
 VortexOcean{
 	var <lfos, <lfoFuncs, <numConnections, <influx;
 
-	*new { | influxInstance|
-		^super.new.init(influxInstance)
+	*new { | influxInstance, feedback=true|
+		^super.new.init(influxInstance, feedback)
 	}
 
-	init { | influxInstance|
+	init { | influxInstance, feedback|
 		var classpath = Main.packages.asDict.at('Vortex');
 		lfoFuncs = (classpath +/+ "lib/lfos.scd").load;
 
@@ -31,7 +31,9 @@ VortexOcean{
 
 		this.addToInflux(influx);
 
-		this.feedbackPatch;
+		if(feedback, {
+			this.feedbackPatch;
+		});
 
 		^this
 	}
@@ -95,14 +97,16 @@ VortexOcean{
 
 	}
 
-	feedbackPatch{
+	feedbackPatch{|lag=4|
+		"Applying feedback patch".postln;
+
 		lfos.do{|lfo, lfoNum|
 			// Filter out the lfo receiving the data from other lfo
 			var filteredlfos = lfos.reject({|thislfo, i| i == lfoNum});
 			var chosenlfo = filteredlfos.choose;
 
-			lfo.set(\freq, chosenlfo)
-
+			lfo.lag(\feedback, lag);
+			lfo.map(\feedback, chosenlfo)
 		}
 	}
 }
