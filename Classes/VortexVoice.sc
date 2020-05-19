@@ -113,7 +113,8 @@ VortexVoice{
 	}
 
 	exclusionParams{
-		var protection = "wet%".format(protectionIndex).asSymbol;
+		var protection = this.p("wet", protectionIndex);
+		var finalVol = \finalVol;//this.p("finalVol", protectionIndex);
 		var invol = \invol;
 		var in = \in;
 
@@ -123,6 +124,7 @@ VortexVoice{
 		excludeParams = [
 			in, 
 			protection, \limiterlevel, \limiterdur,
+			finalVol,
 			record,
 			buffer,
 			invol
@@ -190,8 +192,8 @@ VortexVoice{
 	}
 
 	initProtection{
-		dict.nodeproxy[protectionIndex] = \filter -> {|in, limiterlevel=0.95, limiterdur=0.01|
-			LeakDC.ar(Limiter.ar(in, limiterlevel, limiterdur))
+		dict.nodeproxy[protectionIndex] = \filter -> {|in, limiterlevel=0.95, limiterdur=0.01, finalVol=0.1|
+			LeakDC.ar(Limiter.ar(finalVol * in, limiterlevel, limiterdur))
 
 		}
 	}
