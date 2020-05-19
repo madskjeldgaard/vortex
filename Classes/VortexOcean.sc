@@ -11,13 +11,16 @@ o.attachLfosMapped(Ndef(\yoyo));
 */
 
 VortexOcean{
-	var <lfos, <numConnections, <influx;
+	var <lfos, <lfoFuncs, <numConnections, <influx;
 
 	*new { | influxInstance|
 		^super.new.init(influxInstance)
 	}
 
 	init { | influxInstance|
+		var classpath = Main.packages.asDict.at('Vortex');
+		lfoFuncs = (classpath +/+ "lib/lfos.scd").load;
+
 		influx = influxInstance;
 
 		numConnections = influx.outNames.size;
@@ -28,30 +31,35 @@ VortexOcean{
 
 		this.addToInflux(influx);
 
+
 		^this
 	}
 
-	makeLfo{|lfoNum=0|
+	makeLfo{|lfoNum=0, kind=\saw|
 		var initPhase = 4pi.rand2;
+		var lfoFunc;
 		var lfo = NodeProxy.new(rate: 'control',  numChannels: 1);
 
-		lfo.source = {|freq=0.1, amp=1| 
-			// SinOsc.kr(freq, initPhase, amp)
-			LFSaw.kr(freq, initPhase, amp)
-			// LFNoise2.kr(freq, amp)
-		};
+		lfoFunc = lfoFuncs.choose;
 
-		^lfo.set(\freq, 0.015.rand2);
+		lfo.source = lfoFunc; 
+
+		^lfo.set(\freq, 0.15.rand2);
 	}
 
 	addToInflux{|influx, freqScale = 0.1|
 		influx.action.add('setOcean', {|i|
 			var outVals = i.outValDict;
 
+			// Iterate over influx values
 			outVals.keysValuesDo{|outName, value, index|
+				// Used for wrapping
 				var modBy = if(lfos.size > outVals.size, { outVals.size }, { lfos.size });
+
+				// Get lfo for index (wrapped)
 				var lfo = lfos[index % modBy];
 
+				// Set using influx value
 				lfo.set(\freq, value * freqScale)
 			}
 		})
