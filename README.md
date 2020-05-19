@@ -15,6 +15,14 @@ For now, this repository is mostly for documentation purposes and for anyone els
 
 That said, it is a work in progress and designed specifically for the author's own work flow so please don't expect any support if you mess around with it yourself (but please go ahead and do so). It is organized as a SuperCollider Quark, making it easy to install. 
 
+## Design goals
+
+- No sound source: The system only processes sounds, forcing the user to input sound.
+- No control, only influence: The system cannot be fully controlled, only influenced.
+- Channel agnostic: No usage differences between stereo and multichannel outputs.
+- Interface agnostic: May be used using code, patterns and or any physical controller. The system/instrument as an API.
+- Enjoy the extreme discrepancy between system input and output
+
 ## VortexVoice
 ![vortex](documentation/vortex_voice.jpg)
 
