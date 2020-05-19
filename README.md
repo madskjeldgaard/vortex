@@ -52,6 +52,11 @@ The basic idea is to take an input, multiply it by weights and spread it to mult
 
 [This article explains the idea nicely](https://www.3dmin.org/research/open-development-and-design/influx/)
 
+### LFO Network
+To further complicate and distance the releationship between the performer's inputs and the synthesizer parameters in question, it is possible to filter the weighted input data through a feedback network of low frequency oscillators (LFOs) before reaching the destination. 
+
+![vortex-lfo-network](documentation/lfonetwork.jpg)
+
 ## Timebuffer
 
 The output of each Vortex voice is sent to a looping buffer recorder. This is the "varispeed looping tape reel". The buffer is externally available to be timestretched and manipulated further, it can also be saved to disk.
