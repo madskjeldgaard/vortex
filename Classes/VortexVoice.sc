@@ -24,7 +24,8 @@ VortexVoice{
 	<mixIndex=10, // Mixers start here
 	<fxIndex=100, // Fx chain starts here
 	<timeIndex=1000, // Timemachine effect is here
-	<protectionIndex=1001; // DC filter and limiter here;
+	<protectionIndex=1001,
+	<panIndex=1005; // DC filter and limiter here;
 
 	*initClass{
 		Class.initClassTree(KFilter);
@@ -85,6 +86,10 @@ VortexVoice{
 			this.initProtection;
 			thisServer.sync;
 			"Vortex patching step done".postln;
+
+			VortexPan.new(numInchannels: numChannels, numOutchannels: numChannels, voice: this);
+			thisServer.sync;
+			"Vortex pan adder step done".postln;
 
 			// Data setup
 			this.initInflux(ins:2, outs: 32, fluid: fluid);
@@ -339,5 +344,3 @@ VortexVoice{
 	}
 
 }
-
-
