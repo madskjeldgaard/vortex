@@ -1,12 +1,14 @@
 (
 var lfos = ();
-var iphase = 4pi.rand2;
+// var iphase = 4pi.rand2;
+var iphase = 0;
 var minOut=0.0, maxOut=1.0;
 
 lfos.put(
 	\par, 
 	{|feedback=0, freq=1, amp=1.0| 
-		LFPar.kr(freq+(feedback*freq), iphase, mul: amp).linlin(-1.0, 1.0, minOut, maxOut) 
+		var f = freq+(feedback*freq);
+		LFPar.kr(f, iphase, mul: amp).linlin(-1.0, 1.0, minOut, maxOut) 
 	};
 );
 
@@ -49,6 +51,7 @@ lfos.put(
 lfos.put(
 	\varsaw, 
 	{|feedback=0, freq=1, width=0.5, amp=1.0| 
+		freq = freq.linlin(0.0,1.0,-8.0,8.0);
 		VarSaw.kr(freq+(feedback*freq), iphase, width, mul:amp).linlin(-1.0, 1.0, minOut, maxOut) 
 	};
 );
@@ -56,7 +59,7 @@ lfos.put(
 lfos.put(
 	\noisesaw, 
 	{|feedback=0, freq=1, amp=1.0| 
-		VarSaw.kr(freq+(feedback*freq), iphase, width: LFNoise2.kr(freq/10.0).range(0.0,1.0), mul:amp).linlin(-1.0, 1.0, minOut, maxOut) 
+		VarSaw.kr(freq+(feedback*freq), iphase, width: LFNoise2.kr(freq/3.0).range(0.0,1.0), mul:amp).linlin(-1.0, 1.0, minOut, maxOut) 
 	};
 );
 

@@ -26,31 +26,32 @@ VortexOcean{
 		numConnections = influx.outNames.size;
 
 		lfos = numConnections.collect{|conNum| 
-			this.makeLfo(conNum)
+			this.makeLfo(conNum, \varsaw)
 		};
 
-		this.addToInflux(influx);
+		this.addToInflux(influx, valScale: 2.0, parameter:\amp);
 
 		if(feedback, {
-			this.feedbackPatch;
+			// this.feedbackPatch(lag: 1, param: \feedback);
+			this.feedbackPatch(lag: 1, param: \width);
 		});
 
 		^this
 	}
 
-	makeLfo{|lfoNum=0, kind=\saw|
+	makeLfo{|lfoNum=0, kind=\noisesaw|
 		var initPhase = 4pi.rand2;
 		var lfoFunc;
 		var lfo = NodeProxy.new(rate: 'control',  numChannels: 1);
 
-		lfoFunc = lfoFuncs.choose;
+		lfoFunc = lfoFuncs[kind];
 
 		lfo.source = lfoFunc; 
 
-		^lfo.set(\freq, 0.15.rand2);
+		^lfo.set(\freq, rrand(0.01,1.0));
 	}
 
-	addToInflux{|influx, freqScale = 0.1|
+	addToInflux{|influx, valScale = 0.1, parameter=\freq|
 		influx.action.add('setOcean', {|i|
 			var outVals = i.outValDict;
 
@@ -63,7 +64,7 @@ VortexOcean{
 				var lfo = lfos[index % modBy];
 
 				// Set using influx value
-				lfo.set(\freq, value * freqScale)
+				lfo.set(parameter, value * valScale)
 			}
 		})
 	}
@@ -98,18 +99,20 @@ VortexOcean{
 	}
 
 	// TODO
-	feedbackPatch{|lag=4|
+	feedbackPatch{|lag=0.14, param=\feedback|
 		"Applying feedback patch".postln;
 		fork{
 			lfos.do{|lfo, lfoNum|
-				// Filter out the lfo receiving the data from other lfo
+				// Filter out this lfo
 				var filteredlfos = lfos.reject({|thislfo, i| i == lfoNum});
+
+				// Randomly choose lfo from filtered
 				var chosenlfo = filteredlfos.choose;
 
 				Server.default.sync;
 
-				lfo.lag(\feedback, lag);
-				lfo.map(\feedback, chosenlfo)
+				lfo.lag(param, lag);
+				lfo.map(param, chosenlfo)
 			}
 		}
 
