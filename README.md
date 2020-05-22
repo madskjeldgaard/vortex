@@ -9,62 +9,10 @@ At it's core it has a complex web of sound processes divided in voices, all of t
 
 The name is meant to illustrate the fact that there is a continuous, turbulent flow and that the sounds and movements of the performer disappear in this fluid motion.
 
+For [more information about this project, go here](https://madskjeldgaard.dk/projects/vortex/).
+
 ## About this repository
 
 For now, this repository is mostly for documentation purposes and for anyone else to be inspired by.
 
 That said, it is a work in progress and designed specifically for the author's own work flow so please don't expect any support if you mess around with it yourself (but please go ahead and do so). It is organized as a SuperCollider Quark, making it easy to install. 
-
-## Design goals
-
-- No sound source: The system only processes sounds, forcing the user to input sound.
-- No control, only influence: The system cannot be fully controlled, only influenced.
-- Channel agnostic: No usage differences between stereo and multichannel outputs.
-- Interface agnostic: May be used using code, patterns and or any physical controller. The system/instrument as an API.
-- Enjoy the extreme discrepancy between system input and output
-
-## VortexVoice
-![vortex](documentation/vortex_voice.jpg)
-
-A vortex voice contains:
-- A sound process:
-	- Input from the soundcard
-	- An fxchain (organized via Sleet)
-	- A time machine (a long, looping buffer recorder playing at variable rate)
-	- Outputs going to the soundcard
-	- Output going to other voices
-	- A mixer for mixing in other voices
-- A data process:
-	- Simple input controller input
-- A trajectory which has multiple usecases:
-	- Warps the data output as a sort of wavetable where the data becomes an index in the trajectory
-	- An envelope for sound processes
-	- A trajectory for musical structures on a stretchable time scale 
-
-### Dynamic fx patching and organization
-All effect chains are managed using the [Sleet](https://github.com/madskjeldgaard/sleet) package by the same author.
-
-This both serves as a library for sound effect algorithms and an infrastructure for quickly organizing and changing effects. 
-In the case of Vortex, this is done primarily using SuperCollider's [nodeproxy role](http://doc.sccode.org/Reference/NodeProxy_roles.html) feature.
-
-## VortexFlux: Trajectories and control data warping
-![trajectory](documentation/trajectory.png)
-
-In stead of letting input data be mapped directly (but weighted) to outputs, the weighted data is used as pointers in a trajectory alloted to each voice. This means that turning a control from 0.0 to 1.0 will pass through valleys and peaks in a path, sort of like a wavetable index:
-
-![vortexflux](documentation/vortexflux2.gif)
-
-Vortex uses a fork of Alberto de Campo's brilliant Influx package for control warping and multiplication. 
-
-The basic idea is to take an input, multiply it by weights and spread it to multiple outputs. This is an extremely powerful idea that can transform a simple input (usually one or two inputs) to many differing outputs.
-
-[This article explains the idea nicely](https://www.3dmin.org/research/open-development-and-design/influx/)
-
-### LFO Network
-To further complicate and distance the releationship between the performer's inputs and the synthesizer parameters in question, it is possible to filter the weighted input data through a feedback network of low frequency oscillators (LFOs) before reaching the destination. 
-
-![vortex-lfo-network](documentation/lfonetwork.jpg)
-
-## Timebuffer
-
-The output of each Vortex voice is sent to a looping buffer recorder. This is the "varispeed looping tape reel". The buffer is externally available to be timestretched and manipulated further, it can also be saved to disk.
