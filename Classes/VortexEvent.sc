@@ -7,13 +7,15 @@ VortexEvent{
 
 	init {
 		var classpath = Main.packages.asDict.at('Vortex');
+		var result;
 		if(loaded.not, {
 			"Loading Vortex events ".postln;
 			loaded = true;
-			(classpath +/+ "lib/vortexevent.scd").load;
+			result = (classpath +/+ "lib/vortexevent.scd").load;
+			^result
 		}, {
 			"Vortex events already loaded".postln;
-		})
+		});
 	}
 }
 

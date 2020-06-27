@@ -1,14 +1,15 @@
 Vortex{
-	var <voices;
+	var <voices, <path;
 
-	*new { | server, numVortices=2, numChannels=2 |
-		^super.new.init(server, numVortices, numChannels)
+	*new { | server, numVortices=2, numChannels=2, fluid=true|
+		^super.new.init(server, numVortices, numChannels, fluid)
 	}
 
-	init { | server, numVortices, numChannels |
+	init { | server, numVortices, numChannels, fluid |
+		VortexEvent.new;
 
 		numVortices.do{|i|
-			VortexVoice.new(server,  voicename: nil,  numChans: numChannels,  time: 8)
+			VortexVoice.new(server,  voicename: nil,  numChans: numChannels,  time: 16, fluid: fluid)
 		};
 
 		voices = VortexVoice.voices;
